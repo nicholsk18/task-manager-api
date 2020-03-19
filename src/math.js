@@ -1,8 +1,15 @@
-const calculateTip = (total, tipPer) => {
-    const tip = total * tipPer
-    return total + tip
+const calculateTip = (total, tipPer = .25) => total + (total * tipPer)
+
+const fahrenheitToCelsius = (temp) => {
+    return (temp - 32) / 1.8
+}
+
+const celsiusToFahrenheit = (temp) => {
+    return (temp * 1.8) + 32
 }
 
 module.exports = {
-    calculateTip
+    calculateTip,
+    fahrenheitToCelsius,
+    celsiusToFahrenheit
 }
