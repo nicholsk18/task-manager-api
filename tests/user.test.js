@@ -86,7 +86,7 @@ test('Should not get profile for unauthenticated user', async () => {
 })
 
 test('Should delete account for user', async () => {
-    request(app)
+    await request(app)
         .delete('/users/me')
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
         .send()
@@ -113,4 +113,17 @@ test('Should upload avatar image', async () => {
     
     const user = await User.findById(userOneId)
     expect(user.avatar).toEqual(expect.any(Buffer))
+})
+
+test('Should update valid user fields', async () => {
+    await request(app)
+    .patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    
+
+    const user = await User.findById(userOneId)
+})
+
+test('Should not update invalid user fields', async () => {
+
 })
