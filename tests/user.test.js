@@ -1,27 +1,11 @@
 
 const request = require('supertest')
-const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
 const app = require('../src/app')
 const User = require('../src/models/user')
-
-const userOneId = new mongoose.Types.ObjectId()
-const userOne = {
-    _id: userOneId,
-    name: 'Mike',
-    email: 'mike@test.com',
-    password: '56what!!',
-    tokens:[{
-        token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
-    }]
-}
+const { userOne, userOneId, setupDatabase} = require('./fixtures/db')
 
 // runs before each test
-beforeEach(async () => {
-    await User.deleteMany()
-    await new User(userOne).save()
-
-})
+beforeEach(setupDatabase)
 
 
 // runs after
@@ -30,7 +14,8 @@ beforeEach(async () => {
 // })
 
 test('Should sign up a new user', async () => {
-    const response = await request(app).post('/users').send({
+    const response = await request(app).post('/users')
+    .send({
         name: 'Karson',
         email: 'karson@example.com',
         password: 'MyPass7777!'
@@ -93,7 +78,7 @@ test('Should delete account for user', async () => {
         .expect(200)
 
     const user = await User.findById(userOne)
-    expect(user).not.toBeNull()
+    expect(user).toBeNull()
 
 })
 
@@ -119,11 +104,22 @@ test('Should update valid user fields', async () => {
     await request(app)
     .patch('/users/me')
     .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-    
+    .send({
+        name: 'new name'
+    })
+    .expect(200)
 
-    const user = await User.findById(userOneId)
+    const user = await User.findById(userOne)
+    expect(user.name).toEqual('new name')
+
 })
 
 test('Should not update invalid user fields', async () => {
+    await request(app)
+    .patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({
+        location: 'new location'
+    }).expect(400)
 
 })
