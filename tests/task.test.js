@@ -1,7 +1,16 @@
 const request = require('supertest')
 const app = require('../src/app')
 const Task = require('../src/models/task')
-const { userOne, userOneId, userTwo, userTwoId, setupDatabase} = require('./fixtures/db')
+const { 
+    userOne, 
+    userOneId, 
+    userTwo, 
+    userTwoId, 
+    taskOne, 
+    taskTwo, 
+    taskThree, 
+    setupDatabase
+} = require('./fixtures/db')
 
 beforeEach(setupDatabase)
 
@@ -32,8 +41,11 @@ test('Should fetch user tasks', async () => {
 
 test('Should not delete other users task', async () => {
     const response = await request(app)
-        .delete(`/tasks ${userOneId.id}`)
-        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .delete(`/tasks/${taskOne._id}`)
+        .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
         .send()
-        .expect(200)
+        .expect(404)
+
+    const task = await Task.findById(taskOne._id)
+    expect(task).not.toBeNull()
 })
