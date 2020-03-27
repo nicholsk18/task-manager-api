@@ -46,6 +46,9 @@ test('Should not delete other users task', async () => {
         .send()
         .expect(404)
 
+    // make sure task is not null
     const task = await Task.findById(taskOne._id)
     expect(task).not.toBeNull()
 })
+
+// need to write more test using meads.io github gist
