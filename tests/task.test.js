@@ -76,9 +76,17 @@ test('Should fetch only completed tasks', async () => {
         .send()
         .expect(200)
 
-    const task = await Task.findById(response.body._id)
-    // expect(task.completed).toEqual(true)
-    console.log(response.body)
+    expect(response.body.length).toEqual(1)
+})
+
+test('Should fetch only incomplete tasks', async () => {
+    const response = await request(app)
+        .get('/tasks?completed=false')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send()
+        .expect(200)
+
+    expect(response.body.length).toEqual(1)
 })
 
 test('Should not delete other users task', async () => {
@@ -129,9 +137,6 @@ test('Should not update other users tasks', async () => {
 
 
 // Task Test Ideas
-//
 
-// Should fetch only completed tasks
-// Should fetch only incomplete tasks
 // Should sort tasks by description/completed/createdAt/updatedAt
 // Should fetch page of tasks
