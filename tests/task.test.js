@@ -34,9 +34,51 @@ test('Should fetch user tasks', async () => {
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
         .send()
         .expect(200)
-    
+
     expect(response.body.length).toEqual(2)
-    
+})
+
+test('Should fetch user tasks by id', async () => {
+    const response = await request(app)
+        .get(`/tasks/${taskOne._id}`)
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send()
+        .expect(200)
+
+    expect(response.body.description).toEqual('First task')
+})
+
+test('Should not fetch user task by id if unauthenticated', async () => {
+    const response = await request(app)
+        .get(`/tasks/${taskOne._id}`)
+        .send()
+        .expect(401)
+
+    const task = await Task.findById(response.body._id)
+    expect(task).toBeNull()
+
+})
+test('Should not fetch other users task by id', async () => {
+    const response = await request(app)
+        .get(`/tasks/${taskOne._id}`)
+        .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+        .send()
+        .expect(404)
+
+    const task = await Task.findById(response.body._id)
+    expect(task).toBeNull()
+})
+
+test('Should fetch only completed tasks', async () => {
+    const response = await request(app)
+        .get('/tasks?completed=true')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send()
+        .expect(200)
+
+    const task = await Task.findById(response.body._id)
+    // expect(task.completed).toEqual(true)
+    console.log(response.body)
 })
 
 test('Should not delete other users task', async () => {
@@ -72,13 +114,23 @@ test('Should not delete task if unauthenticated', async () => {
     expect(task).not.toBeNull()
 })
 
+test('Should not update other users tasks', async () => {
+    const response = await request(app)
+        .patch(`/tasks/${taskOne._id}`)
+        .set('Authorization', `Bearer ${userTwo.tokens[0].token}`)
+        .send({
+            completed: true
+        })
+        .expect(404)
+
+    const task = await Task.findById(taskOne._id)
+    expect(task.completed).toEqual(false)
+})
+
+
 // Task Test Ideas
 //
-// Should not delete task if unauthenticated
-// Should not update other users task
-// Should fetch user task by id
-// Should not fetch user task by id if unauthenticated
-// Should not fetch other users task by id
+
 // Should fetch only completed tasks
 // Should fetch only incomplete tasks
 // Should sort tasks by description/completed/createdAt/updatedAt

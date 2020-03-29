@@ -43,7 +43,7 @@ const taskThree = {
     _id: new mongoose.Types.ObjectId(),
     description: 'Three task',
     completed: false,
-    owner: userTwo._id // userOneId
+    owner: userTwo._id // userTwoId
 }
 
 const setupDatabase = async () => {
