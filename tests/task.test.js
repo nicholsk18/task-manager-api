@@ -62,9 +62,18 @@ test('Should delete user task', async () => {
     expect(task).toBeNull()
 })
 
+test('Should not delete task if unauthenticated', async () => {
+    const response = await request(app)
+        .delete(`/tasks/${taskOne._id}`)
+        .send()
+        .expect(401)
+
+    const task = await Task.findById(taskOne._id)
+    expect(task).not.toBeNull()
+})
+
 // Task Test Ideas
 //
-// Should delete user task
 // Should not delete task if unauthenticated
 // Should not update other users task
 // Should fetch user task by id
