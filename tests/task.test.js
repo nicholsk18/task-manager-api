@@ -51,4 +51,26 @@ test('Should not delete other users task', async () => {
     expect(task).not.toBeNull()
 })
 
-// need to write more test using meads.io github gist
+test('Should delete user task', async () => {
+    const response = await request(app)
+        .delete(`/tasks/${taskOne._id}`)
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send()
+        .expect(200)
+
+    const task = await Task.findById(taskOne._id)
+    expect(task).toBeNull()
+})
+
+// Task Test Ideas
+//
+// Should delete user task
+// Should not delete task if unauthenticated
+// Should not update other users task
+// Should fetch user task by id
+// Should not fetch user task by id if unauthenticated
+// Should not fetch other users task by id
+// Should fetch only completed tasks
+// Should fetch only incomplete tasks
+// Should sort tasks by description/completed/createdAt/updatedAt
+// Should fetch page of tasks
